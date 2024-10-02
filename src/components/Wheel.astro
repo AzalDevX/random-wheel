@@ -2,26 +2,29 @@
 ---
 
 <div id="wheelContainer" class="relative w-[400px] h-[400px]">
-    <canvas
-      id="wheelCanvas"
-      width="400"
-      height="400"
-      class="rounded-lg shadow-lg hidden"
-    ></canvas>
-    <div id="emptyWheel" class="w-full h-full bg-white rounded-lg shadow-lg flex items-center justify-center p-6">
-      <p class="text-xl text-gray-600 text-center">Add options to start spinning the wheel!</p>
-    </div>
-    <button
-      id="spinButton"
-      class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-purple-500 text-white font-bold py-2 px-4 rounded-full shadow-lg hover:bg-purple-600 active:bg-purple-700 transition-colors duration-300 hidden"
-    >
-      SPIN
-    </button>
-    <div id="indicator" class="absolute right-0 top-1/2 transform translate-x-1/2 -translate-y-1/2 hidden">
-      <div class="w-0 h-0 border-t-[15px] border-t-transparent border-b-[15px] border-b-transparent border-r-[30px] border-r-white"></div>
-    </div>
+  <canvas
+    id="wheelCanvas"
+    width="400"
+    height="400"
+    class="hidden"
+  ></canvas>
+  <div id="emptyWheel" class="w-full h-full bg-white rounded-lg shadow-lg flex items-center justify-center p-6">
+    <p class="text-xl text-gray-600 text-center">Add options to start spinning the wheel!</p>
   </div>
-  
+  <button
+    id="spinButton"
+    class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white text-purple-500 font-bold p-4 w-16 h-16 rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:bg-purple-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 active:translate-y-0.5 active:shadow-inner group"
+    aria-label="Spin the wheel"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-8 h-8 transition-transform duration-300 group-hover:scale-110">
+      <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/>
+    </svg>
+  </button>
+  <div id="indicator" class="absolute right-0 top-1/2 transform translate-x-1/2 -translate-y-1/2 hidden">
+    <div class="w-0 h-0 border-t-[15px] border-t-transparent border-b-[15px] border-b-transparent border-r-[30px] border-r-white"></div>
+  </div>
+</div>
+
 <div id="winnerPopup" class="fixed inset-0 flex items-center justify-center hidden">
   <div class="absolute inset-0 bg-black bg-opacity-30 backdrop-blur-sm"></div>
   <div class="relative bg-white bg-opacity-70 backdrop-blur-md p-8 rounded-lg shadow-xl w-3/4 md:w-9/10 z-10 border-4 border-white">
@@ -31,7 +34,7 @@
     <p id="winnerText" class="text-4xl md:text-6xl font-bold text-center break-words"></p>
   </div>
 </div>
-  
+
 <script>
   const wheelCanvas = document.getElementById('wheelCanvas');
   const emptyWheel = document.getElementById('emptyWheel');
@@ -44,6 +47,7 @@
   let items = [];
   let isSpinning = false;
   let lastOptionIndex = -1;
+  let longestOption = '';
 
   const winnerSound = new Audio('/winner.ogg');
   winnerSound.load();
@@ -51,6 +55,16 @@
   const optionSound = new Audio('/option.ogg');
   optionSound.volume = 0.25; // Set volume to 25%
   optionSound.load();
+
+  function calculateFontSize(text, maxWidth, maxFontSize) {
+    ctx.font = `bold ${maxFontSize}px Arial`;
+    let fontSize = maxFontSize;
+    while (ctx.measureText(text).width > maxWidth && fontSize > 8) {
+      fontSize--;
+      ctx.font = `bold ${fontSize}px Arial`;
+    }
+    return fontSize;
+  }
 
   function drawWheel(rotationAngle = 0) {
     if (items.length === 0) {
@@ -77,6 +91,10 @@
     ctx.rotate(rotationAngle);
     ctx.translate(-centerX, -centerY);
 
+    const maxWidth = radius - 20;
+    const maxFontSize = 18;
+    const fontSize = calculateFontSize(longestOption, maxWidth, maxFontSize);
+
     items.forEach((item, index) => {
       const startAngle = (index / items.length) * 2 * Math.PI;
       const endAngle = ((index + 1) / items.length) * 2 * Math.PI;
@@ -97,8 +115,29 @@
       ctx.rotate((startAngle + endAngle) / 2);
       ctx.textAlign = 'right';
       ctx.fillStyle = 'white';
-      ctx.font = 'bold 18px Arial';
-      ctx.fillText(item, radius - 20, 0);
+      ctx.font = `bold ${fontSize}px Arial`;
+      
+      // Text wrapping
+      const words = item.split(' ');
+      let line = '';
+      let y = -fontSize / 2;
+      const lineHeight = fontSize * 1.2;
+      
+      for (let n = 0; n < words.length; n++) {
+        const testLine = line + words[n] + ' ';
+        const metrics = ctx.measureText(testLine);
+        const testWidth = metrics.width;
+        if (testWidth > maxWidth && n > 0) {
+          ctx.fillText(line, radius - 10, y);
+          line = words[n] + ' ';
+          y += lineHeight;
+        }
+        else {
+          line = testLine;
+        }
+      }
+      ctx.fillText(line, radius - 10, y);
+      
       ctx.restore();
     });
 
@@ -127,15 +166,14 @@
 
     isSpinning = true;
     spinButton.disabled = true;
-    spinButton.textContent = 'Spinning...';
 
     // Random spin parameters
-    const minSpinTime = 5000; // Minimum spin time: 5 seconds
-    const maxExtraTime = 5000; // Up to 5 extra seconds
+    const minSpinTime = 5000;
+    const maxExtraTime = 5000;
     const totalSpinTime = minSpinTime + Math.random() * maxExtraTime;
     
-    const minRotations = 5; // Minimum number of rotations
-    const maxExtraRotations = 10; // Up to 10 extra rotations
+    const minRotations = 5;
+    const maxExtraRotations = 10;
     const totalRotations = minRotations + Math.random() * maxExtraRotations;
 
     const startTime = Date.now();
@@ -148,12 +186,15 @@
 
       drawWheel(currentRotation);
 
+      // Rotate the button in the opposite direction
+      spinButton.style.transform = `translate(-50%, -50%) rotate(${-currentRotation}rad)`;
+
       if (progress < 1) {
         requestAnimationFrame(spin);
       } else {
         isSpinning = false;
         spinButton.disabled = false;
-        spinButton.textContent = 'SPIN';
+        spinButton.style.transform = 'translate(-50%, -50%) rotate(0deg)';
         const winningIndex = items.length - 1 - Math.floor((currentRotation / (2 * Math.PI)) % 1 * items.length);
         showWinnerPopup(items[winningIndex]);
       }
@@ -185,6 +226,7 @@
   // Listen for item updates
   document.addEventListener('itemsUpdated', (e) => {
     items = e.detail;
+    longestOption = items.reduce((a, b) => a.length > b.length ? a : b, '');
     drawWheel();
   });
 

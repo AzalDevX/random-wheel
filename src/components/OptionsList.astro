@@ -1,79 +1,85 @@
 ---
 ---
 
-<div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
-    <h2 class="text-2xl font-bold text-gray-800 mb-4">Options</h2>
-    <div class="flex mb-4">
-      <input
-        type="text"
-        id="newOption"
-        class="flex-grow px-4 py-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-        placeholder="Add new option"
-      />
-      <button
-        id="addButton"
-        class="bg-purple-500 text-white px-4 py-2 rounded-r-lg hover:bg-purple-600 active:bg-purple-700 transition-colors duration-300"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-      </button>
-    </div>
-    <ul id="optionsList" class="space-y-2"></ul>
+<div class="bg-white rounded-lg shadow-lg p-4 sm:p-6 w-full max-w-md mx-auto">
+  <h2 class="text-xl sm:text-2xl font-bold text-gray-800 mb-4">Options</h2>
+  <div class="flex mb-4">
+    <input
+      type="text"
+      id="newOption"
+      class="flex-grow px-3 sm:px-4 py-2 text-sm sm:text-base border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+      placeholder="Add new option"
+    />
+    <button
+      id="addButton"
+      class="bg-purple-500 text-white px-3 sm:px-4 py-2 rounded-r-lg hover:bg-purple-600 active:bg-purple-700 transition-colors duration-300"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+    </button>
   </div>
-  
-  <script>
-    const newOptionInput = document.getElementById('newOption');
-    const addButton = document.getElementById('addButton');
-    const optionsList = document.getElementById('optionsList');
-  
-    let items = [];
-  
-    function addOption() {
-      const newOption = newOptionInput.value.trim();
-      if (newOption) {
-        items.push(newOption);
-        updateOptionsList();
-        newOptionInput.value = '';
-        newOptionInput.focus();
-      }
-    }
-  
-    function removeOption(index) {
-      items.splice(index, 1);
+  <ul id="optionsList" class="space-y-2 max-h-60 overflow-y-auto"></ul>
+</div>
+
+<style>
+  body {
+    overflow-x: hidden;
+  }
+</style>
+
+<script>
+  const newOptionInput = document.getElementById('newOption');
+  const addButton = document.getElementById('addButton');
+  const optionsList = document.getElementById('optionsList');
+
+  let items = [];
+
+  function addOption() {
+    const newOption = newOptionInput.value.trim();
+    if (newOption && !items.includes(newOption)) {
+      items.push(newOption);
       updateOptionsList();
+      newOptionInput.value = '';
+      newOptionInput.focus();
     }
-  
-    function updateOptionsList() {
-      optionsList.innerHTML = '';
-      items.forEach((item, index) => {
-        const li = document.createElement('li');
-        li.className = 'flex justify-between items-center bg-gray-100 px-4 py-2 rounded-lg';
-        li.innerHTML = `
-          <span>${item}</span>
-          <button class="text-red-500 hover:text-red-700 transition-colors duration-300" data-index="${index}">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-          </button>
-        `;
-        optionsList.appendChild(li);
-      });
-  
-      // Dispatch event to update wheel
-      const event = new CustomEvent('itemsUpdated', { detail: items });
-      document.dispatchEvent(event);
-    }
-  
-    addButton.addEventListener('click', addOption);
-    optionsList.addEventListener('click', (e) => {
-      if (e.target.closest('button')) {
-        const index = parseInt(e.target.closest('button').dataset.index);
-        removeOption(index);
-      }
-    });
-  
-    newOptionInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        addOption();
-      }
-    });
-  
+  }
+
+  function removeOption(index) {
+    items.splice(index, 1);
     updateOptionsList();
-  </script>
+  }
+
+  function updateOptionsList() {
+    optionsList.innerHTML = '';
+    items.forEach((item, index) => {
+      const li = document.createElement('li');
+      li.className = 'flex justify-between items-center bg-gray-100 px-3 sm:px-4 py-2 rounded-lg text-sm sm:text-base';
+      li.innerHTML = `
+        <span class="break-all mr-2">${item}</span>
+        <button class="text-red-500 hover:text-red-700 transition-colors duration-300 flex-shrink-0" data-index="${index}">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      `;
+      optionsList.appendChild(li);
+    });
+
+    // Dispatch event to update wheel
+    const event = new CustomEvent('itemsUpdated', { detail: items });
+    document.dispatchEvent(event);
+  }
+
+  addButton.addEventListener('click', addOption);
+  optionsList.addEventListener('click', (e) => {
+    if (e.target.closest('button')) {
+      const index = parseInt(e.target.closest('button').dataset.index);
+      removeOption(index);
+    }
+  });
+
+  newOptionInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      addOption();
+    }
+  });
+
+  updateOptionsList();
+</script>

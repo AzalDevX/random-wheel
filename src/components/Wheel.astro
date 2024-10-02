@@ -1,41 +1,40 @@
 ---
 ---
 
-<div id="wheelContainer" class="relative md:w-[400px] h-[400px]">
+<div id="wheelContainer" class="relative w-full max-w-[400px] aspect-square mx-auto">
   <canvas
     id="wheelCanvas"
-    width="400"
-    height="400"
-    class="hidden"
+    class="w-full h-full hidden"
   ></canvas>
   <div id="emptyWheel" class="w-full h-full bg-white rounded-lg shadow-lg flex items-center justify-center p-6">
     <p class="text-xl text-gray-600 text-center">Add options to start spinning the wheel!</p>
   </div>
   <button
     id="spinButton"
-    class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white text-purple-500 font-bold p-4 w-16 h-16 rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:bg-purple-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 active:translate-y-0.5 active:shadow-inner group"
+    class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white text-purple-500 font-bold p-2 sm:p-4 w-12 h-12 sm:w-16 sm:h-16 rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:bg-purple-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 active:translate-y-0.5 active:shadow-inner group"
     aria-label="Spin the wheel"
   >
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-8 h-8 transition-transform duration-300 group-hover:scale-110">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 sm:w-8 sm:h-8 transition-transform duration-300 group-hover:scale-110">
       <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/>
     </svg>
   </button>
   <div id="indicator" class="absolute right-0 top-1/2 transform translate-x-1/2 -translate-y-1/2 hidden">
-    <div class="w-0 h-0 border-t-[15px] border-t-transparent border-b-[15px] border-b-transparent border-r-[30px] border-r-white"></div>
+    <div class="w-0 h-0 border-t-[10px] sm:border-t-[15px] border-t-transparent border-b-[10px] sm:border-b-[15px] border-b-transparent border-r-[20px] sm:border-r-[30px] border-r-white"></div>
   </div>
 </div>
 
 <div id="winnerPopup" class="fixed inset-0 flex items-center justify-center hidden">
   <div class="absolute inset-0 bg-black bg-opacity-30 backdrop-blur-sm"></div>
-  <div class="relative bg-white bg-opacity-70 backdrop-blur-md p-8 rounded-lg shadow-xl w-3/4 md:w-9/10 z-10 border-4 border-white">
-    <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white px-4 py-2 rounded-full shadow-md">
-      <span class="text-xl font-bold text-purple-600">WINNER</span>
+  <div class="relative bg-white bg-opacity-70 backdrop-blur-md p-6 sm:p-8 rounded-lg shadow-xl w-11/12 max-w-md sm:w-3/4 md:w-9/10 z-10 border-4 border-white">
+    <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white px-3 py-1 sm:px-4 sm:py-2 rounded-full shadow-md">
+      <span class="text-lg sm:text-xl font-bold text-purple-600">WINNER</span>
     </div>
-    <p id="winnerText" class="text-4xl md:text-6xl font-bold text-center break-words"></p>
+    <p id="winnerText" class="text-2xl sm:text-4xl md:text-6xl font-bold text-center break-words"></p>
   </div>
 </div>
 
 <script>
+  const wheelContainer = document.getElementById('wheelContainer');
   const wheelCanvas = document.getElementById('wheelCanvas');
   const emptyWheel = document.getElementById('emptyWheel');
   const spinButton = document.getElementById('spinButton');
@@ -92,7 +91,7 @@
     ctx.translate(-centerX, -centerY);
 
     const maxWidth = radius - 20;
-    const maxFontSize = 18;
+    const maxFontSize = Math.min(18, radius / 10);
     const fontSize = calculateFontSize(longestOption, maxWidth, maxFontSize);
 
     items.forEach((item, index) => {
@@ -145,7 +144,7 @@
 
     // Draw center circle
     ctx.beginPath();
-    ctx.arc(centerX, centerY, 25, 0, 2 * Math.PI);
+    ctx.arc(centerX, centerY, radius / 8, 0, 2 * Math.PI);
     ctx.fillStyle = 'white';
     ctx.fill();
 
@@ -220,6 +219,15 @@
     playWinnerSound();
   }
 
+  function resizeWheel() {
+    const containerWidth = wheelContainer.offsetWidth;
+    wheelCanvas.width = containerWidth;
+    wheelCanvas.height = containerWidth;
+    drawWheel();
+  }
+
+  window.addEventListener('resize', resizeWheel);
+  resizeWheel();
   drawWheel();
   spinButton.addEventListener('click', spinWheel);
 

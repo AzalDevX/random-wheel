@@ -1,0 +1,197 @@
+---
+---
+
+<div id="wheelContainer" class="relative w-[400px] h-[400px]">
+    <canvas
+      id="wheelCanvas"
+      width="400"
+      height="400"
+      class="rounded-lg shadow-lg hidden"
+    ></canvas>
+    <div id="emptyWheel" class="w-full h-full bg-white rounded-lg shadow-lg flex items-center justify-center p-6">
+      <p class="text-xl text-gray-600 text-center">Add options to start spinning the wheel!</p>
+    </div>
+    <button
+      id="spinButton"
+      class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-purple-500 text-white font-bold py-2 px-4 rounded-full shadow-lg hover:bg-purple-600 active:bg-purple-700 transition-colors duration-300 hidden"
+    >
+      SPIN
+    </button>
+    <div id="indicator" class="absolute right-0 top-1/2 transform translate-x-1/2 -translate-y-1/2 hidden">
+      <div class="w-0 h-0 border-t-[15px] border-t-transparent border-b-[15px] border-b-transparent border-r-[30px] border-r-white"></div>
+    </div>
+  </div>
+  
+<div id="winnerPopup" class="fixed inset-0 flex items-center justify-center hidden">
+  <div class="absolute inset-0 bg-black bg-opacity-30 backdrop-blur-sm"></div>
+  <div class="relative bg-white bg-opacity-70 backdrop-blur-md p-8 rounded-lg shadow-xl w-3/4 md:w-9/10 z-10 border-4 border-white">
+    <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white px-4 py-2 rounded-full shadow-md">
+      <span class="text-xl font-bold text-purple-600">WINNER</span>
+    </div>
+    <p id="winnerText" class="text-4xl md:text-6xl font-bold text-center break-words"></p>
+  </div>
+</div>
+  
+<script>
+  const wheelCanvas = document.getElementById('wheelCanvas');
+  const emptyWheel = document.getElementById('emptyWheel');
+  const spinButton = document.getElementById('spinButton');
+  const indicator = document.getElementById('indicator');
+  const winnerPopup = document.getElementById('winnerPopup');
+  const winnerText = document.getElementById('winnerText');
+  const ctx = wheelCanvas.getContext('2d');
+
+  let items = [];
+  let isSpinning = false;
+  let lastOptionIndex = -1;
+
+  const winnerSound = new Audio('/winner.ogg');
+  winnerSound.load();
+
+  const optionSound = new Audio('/option.ogg');
+  optionSound.volume = 0.25; // Set volume to 25%
+  optionSound.load();
+
+  function drawWheel(rotationAngle = 0) {
+    if (items.length === 0) {
+      wheelCanvas.classList.add('hidden');
+      emptyWheel.classList.remove('hidden');
+      spinButton.classList.add('hidden');
+      indicator.classList.add('hidden');
+      return;
+    }
+
+    wheelCanvas.classList.remove('hidden');
+    emptyWheel.classList.add('hidden');
+    spinButton.classList.remove('hidden');
+    indicator.classList.remove('hidden');
+
+    const centerX = wheelCanvas.width / 2;
+    const centerY = wheelCanvas.height / 2;
+    const radius = Math.min(centerX, centerY) - 10;
+
+    ctx.clearRect(0, 0, wheelCanvas.width, wheelCanvas.height);
+
+    ctx.save();
+    ctx.translate(centerX, centerY);
+    ctx.rotate(rotationAngle);
+    ctx.translate(-centerX, -centerY);
+
+    items.forEach((item, index) => {
+      const startAngle = (index / items.length) * 2 * Math.PI;
+      const endAngle = ((index + 1) / items.length) * 2 * Math.PI;
+
+      ctx.beginPath();
+      ctx.moveTo(centerX, centerY);
+      ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+      ctx.closePath();
+
+      const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
+      gradient.addColorStop(0, `hsl(${index * 360 / items.length}, 100%, 80%)`);
+      gradient.addColorStop(1, `hsl(${index * 360 / items.length}, 100%, 50%)`);
+      ctx.fillStyle = gradient;
+      ctx.fill();
+
+      ctx.save();
+      ctx.translate(centerX, centerY);
+      ctx.rotate((startAngle + endAngle) / 2);
+      ctx.textAlign = 'right';
+      ctx.fillStyle = 'white';
+      ctx.font = 'bold 18px Arial';
+      ctx.fillText(item, radius - 20, 0);
+      ctx.restore();
+    });
+
+    ctx.restore();
+
+    // Draw center circle
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, 25, 0, 2 * Math.PI);
+    ctx.fillStyle = 'white';
+    ctx.fill();
+
+    // Check if the option has changed and play the sound
+    const currentOptionIndex = items.length - 1 - Math.floor((rotationAngle / (2 * Math.PI)) % 1 * items.length);
+    if (currentOptionIndex !== lastOptionIndex) {
+      playOptionSound();
+      lastOptionIndex = currentOptionIndex;
+    }
+  }
+
+  function easeOutQuart(t) {
+    return 1 - Math.pow(1 - t, 4);
+  }
+
+  function spinWheel() {
+    if (isSpinning || items.length === 0) return;
+
+    isSpinning = true;
+    spinButton.disabled = true;
+    spinButton.textContent = 'Spinning...';
+
+    // Random spin parameters
+    const minSpinTime = 5000; // Minimum spin time: 5 seconds
+    const maxExtraTime = 5000; // Up to 5 extra seconds
+    const totalSpinTime = minSpinTime + Math.random() * maxExtraTime;
+    
+    const minRotations = 5; // Minimum number of rotations
+    const maxExtraRotations = 10; // Up to 10 extra rotations
+    const totalRotations = minRotations + Math.random() * maxExtraRotations;
+
+    const startTime = Date.now();
+
+    function spin() {
+      const elapsedTime = Date.now() - startTime;
+      const progress = Math.min(elapsedTime / totalSpinTime, 1);
+      const easedProgress = easeOutQuart(progress);
+      const currentRotation = totalRotations * 2 * Math.PI * easedProgress;
+
+      drawWheel(currentRotation);
+
+      if (progress < 1) {
+        requestAnimationFrame(spin);
+      } else {
+        isSpinning = false;
+        spinButton.disabled = false;
+        spinButton.textContent = 'SPIN';
+        const winningIndex = items.length - 1 - Math.floor((currentRotation / (2 * Math.PI)) % 1 * items.length);
+        showWinnerPopup(items[winningIndex]);
+      }
+    }
+
+    spin();
+  }
+
+  function playWinnerSound() {
+    setTimeout(() => {
+      winnerSound.play();
+    }, 200);
+  }
+
+  function playOptionSound() {
+    optionSound.currentTime = 0;
+    optionSound.play().catch(error => console.error('Error playing option sound:', error));
+  }
+
+  function showWinnerPopup(winner) {
+    winnerText.textContent = winner;
+    winnerPopup.classList.remove('hidden');
+    playWinnerSound();
+  }
+
+  drawWheel();
+  spinButton.addEventListener('click', spinWheel);
+
+  // Listen for item updates
+  document.addEventListener('itemsUpdated', (e) => {
+    items = e.detail;
+    drawWheel();
+  });
+
+  // Close popup when clicking anywhere
+  document.addEventListener('click', (e) => {
+    if (!winnerPopup.classList.contains('hidden')) {
+      winnerPopup.classList.add('hidden');
+    }
+  });
+</script>

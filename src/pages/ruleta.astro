@@ -1,0 +1,24 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Wheel from '../components/Wheel.astro';
+import OptionsList from '../components/OptionsList.astro';
+---
+
+<Layout title="Random Wheel">
+	<div class="min-h-dvh bg-gradient-to-br from-gray-300 to-purple-400 p-8 flex flex-col items-center justify-center">
+		<h1 class="md:-mt-10 text-4xl md:text-8xl font-bold text-gray-800 mb-20">Random Wheel</h1>
+		<div class="flex flex-col md:flex-row items-center justify-center gap-8">
+			<Wheel />
+			<OptionsList />
+		</div>
+		<div id="result" class="mt-8 text-2xl font-bold text-gray-800"></div>
+	</div>
+</Layout>
+
+<script>
+  const resultDiv = document.getElementById('result');
+
+  document.addEventListener('wheelSpinComplete', (e) => {
+    resultDiv.textContent = `Result: ${e.detail}`;
+  });
+</script>

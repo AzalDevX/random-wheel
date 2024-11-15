@@ -1,17 +1,14 @@
----
----
-
 <div id="wheelContainer" class="relative w-full max-w-[400px] aspect-square mx-auto">
   <canvas
     id="wheelCanvas"
     class="w-full h-full hidden"
   ></canvas>
-  <div id="emptyWheel" class="w-full h-full bg-white rounded-lg shadow-lg flex items-center justify-center p-6">
-    <p class="text-xl text-gray-600 text-center">Add options to start spinning the wheel!</p>
+  <div id="emptyWheel" class="w-full h-full bg-beige-100 rounded-lg shadow-chocolate-md flex items-center justify-center p-6">
+    <p class="text-xl text-chocolate-700 text-center">Add options to start spinning the wheel!</p>
   </div>
   <button
     id="spinButton"
-    class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white text-purple-500 font-bold p-2 sm:p-4 w-12 h-12 sm:w-16 sm:h-16 rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:bg-purple-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75 active:shadow-inner group"
+    class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-chocolate-500 text-beige-100 font-bold p-2 sm:p-4 w-12 h-12 sm:w-16 sm:h-16 rounded-full shadow-chocolate-lg flex items-center justify-center transition-all duration-300 hover:bg-chocolate-600 focus:outline-none focus:ring-2 focus:ring-chocolate-400 focus:ring-opacity-75 active:shadow-chocolate-sm group"
     aria-label="Spin the wheel"
   >
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 sm:w-8 sm:h-8 transition-transform duration-300 group-hover:scale-110">
@@ -19,17 +16,17 @@
     </svg>
   </button>
   <div id="indicator" class="absolute right-0 top-1/2 transform translate-x-1/2 -translate-y-1/2 hidden">
-    <div class="w-0 h-0 border-t-[10px] sm:border-t-[15px] border-t-transparent border-b-[10px] sm:border-b-[15px] border-b-transparent border-r-[20px] sm:border-r-[30px] border-r-white"></div>
+    <div class="w-0 h-0 border-t-[10px] sm:border-t-[15px] border-t-transparent border-b-[10px] sm:border-b-[15px] border-b-transparent border-r-[20px] sm:border-r-[30px] border-r-beige-100"></div>
   </div>
 </div>
 
-<div id="winnerPopup" class="fixed inset-0 flex items-center justify-center hidden">
-  <div class="absolute inset-0 bg-black bg-opacity-30 backdrop-blur-sm"></div>
-  <div class="relative bg-white bg-opacity-70 backdrop-blur-md p-6 sm:p-8 rounded-lg shadow-xl w-11/12 max-w-md sm:w-3/4 md:w-9/10 z-10 border-4 border-white">
-    <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white px-3 py-1 sm:px-4 sm:py-2 rounded-full shadow-md">
-      <span class="text-lg sm:text-xl font-bold text-purple-600">WINNER</span>
+<div id="winnerPopup" class="fixed inset-0 flex items-center justify-center hidden z-50">
+  <div class="absolute inset-0 bg-chocolate-900 bg-opacity-30 backdrop-blur-sm"></div>
+  <div class="relative bg-beige-100 bg-opacity-90 backdrop-blur-md p-6 sm:p-8 rounded-lg shadow-chocolate-lg w-11/12 max-w-md sm:w-3/4 md:w-9/10 z-10 border-4 border-chocolate-300">
+    <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-chocolate-500 px-3 py-1 sm:px-4 sm:py-2 rounded-full shadow-chocolate-md">
+      <span class="text-lg sm:text-xl font-bold text-beige-100">WINNER</span>
     </div>
-    <p id="winnerText" class="text-2xl sm:text-4xl md:text-6xl font-bold text-center break-words"></p>
+    <p id="winnerText" class="text-2xl sm:text-4xl md:text-6xl font-bold text-center break-words text-chocolate-800"></p>
   </div>
 </div>
 
@@ -52,7 +49,7 @@
   winnerSound.load();
 
   const optionSound = new Audio('/option.ogg');
-  optionSound.volume = 0.25; // Set volume to 25%
+  optionSound.volume = 0.25;
   optionSound.load();
 
   function calculateFontSize(text, maxWidth, maxFontSize) {
@@ -104,8 +101,8 @@
       ctx.closePath();
 
       const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
-      gradient.addColorStop(0, `hsl(${index * 360 / items.length}, 100%, 80%)`);
-      gradient.addColorStop(1, `hsl(${index * 360 / items.length}, 100%, 50%)`);
+      gradient.addColorStop(0, `hsl(${index * 360 / items.length}, 70%, 80%)`);
+      gradient.addColorStop(1, `hsl(${index * 360 / items.length}, 70%, 60%)`);
       ctx.fillStyle = gradient;
       ctx.fill();
 
@@ -113,7 +110,7 @@
       ctx.translate(centerX, centerY);
       ctx.rotate((startAngle + endAngle) / 2);
       ctx.textAlign = 'right';
-      ctx.fillStyle = 'white';
+      ctx.fillStyle = '#43302b'; // chocolate-900
       ctx.font = `bold ${fontSize}px Arial`;
       
       // Text wrapping
@@ -145,7 +142,7 @@
     // Draw center circle
     ctx.beginPath();
     ctx.arc(centerX, centerY, radius / 8, 0, 2 * Math.PI);
-    ctx.fillStyle = 'white';
+    ctx.fillStyle = '#fdf8f6'; // beige-50
     ctx.fill();
 
     // Check if the option has changed and play the sound
@@ -166,7 +163,6 @@
     isSpinning = true;
     spinButton.disabled = true;
 
-    // Random spin parameters
     const minSpinTime = 5000;
     const maxExtraTime = 5000;
     const totalSpinTime = minSpinTime + Math.random() * maxExtraTime;
@@ -185,7 +181,6 @@
 
       drawWheel(currentRotation);
 
-      // Rotate the button in the opposite direction
       spinButton.style.transform = `translate(-50%, -50%) rotate(${-currentRotation}rad)`;
 
       if (progress < 1) {
@@ -231,14 +226,12 @@
   drawWheel();
   spinButton.addEventListener('click', spinWheel);
 
-  // Listen for item updates
   document.addEventListener('itemsUpdated', (e) => {
     items = e.detail;
     longestOption = items.reduce((a, b) => a.length > b.length ? a : b, '');
     drawWheel();
   });
 
-  // Close popup when clicking anywhere
   document.addEventListener('click', (e) => {
     if (!winnerPopup.classList.contains('hidden')) {
       winnerPopup.classList.add('hidden');

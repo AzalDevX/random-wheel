@@ -5,9 +5,20 @@ import CoinFlip from '../components/CoinFlip.jsx';
 ---
 
 <Layout title="Cara o Cruz">
-	<div class="min-h-dvh bg-gradient-to-br from-pink-200 to-purple-300 p-8 flex flex-col items-center justify-center">
-		<h1 class="text-4xl md:text-8xl font-bold text-gray-800 mb-20">Cara o Cruz</h1>
+	<div class="min-h-dvh bg-gradient-to-br from-beige-100 to-beige-300 p-8 flex flex-col items-center justify-center">
+		<h1 class="text-4xl md:text-8xl font-bold text-chocolate-800 mb-20">Cara o Cruz</h1>
 		<CoinFlip client:load />
-		<a href="/" class="mt-8 bg-purple-500 text-white px-6 py-3 rounded-lg text-xl hover:bg-purple-600 transition-colors">Volver al inicio</a>
+		<!-- <a href="/" class="mt-8 bg-chocolate-500 text-beige-100 px-6 py-3 rounded-lg text-xl hover:bg-chocolate-600 transition-colors">Volver al inicio</a> -->
 	</div>
 </Layout>
+<style is:global>
+.preserve-3d {
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+</style>

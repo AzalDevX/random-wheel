@@ -1,0 +1,106 @@
+---
+// src/components/DynamicIslandMenu.astro
+import { Dices, Disc, Coins, Smile } from 'lucide-react'
+
+const menuItems = [
+  { icon: 'disc', path: '/ruleta', label: 'Ruleta' },
+  { icon: 'coins', path: '/cara-cruz', label: 'Cara o Cruz' },
+  { icon: 'dices', path: '/dados', label: 'Dados' },
+];
+---
+
+<div id="dynamicIsland" class="group fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-[120px] h-[44px] bg-chocolate-800 text-beige-300 rounded-[22px] flex items-center justify-center cursor-pointer overflow-hidden transition-all duration-300 ease-in-out hover:w-[280px] hover:h-[60px] hover:rounded-[30px]">
+  <div id="currentIcon" class="absolute opacity-100 transition-all duration-300 group-hover:opacity-0 group-hover:scale-50">
+    <Smile size={24} />
+  </div>
+  <div id="expandedMenu" class="absolute opacity-0 scale-50 transition-all duration-300 flex justify-around items-center w-full h-full group-hover:opacity-100 group-hover:scale-100">
+    {menuItems.map((item) => (
+      <a href={item.path} class="flex items-center justify-center w-12 h-12 rounded-full hover:bg-chocolate-700 transition-colors" title={item.label}>
+        {item.icon === 'disc' && <Disc size={24} />}
+        {item.icon === 'coins' && <Coins size={24} />}
+        {item.icon === 'dices' && <Dices size={24} />}
+      </a>
+    ))}
+  </div>
+</div>
+
+<script>
+  const dynamicIsland = document.getElementById('dynamicIsland');
+  const currentIcon = document.getElementById('currentIcon');
+  const expandedMenu = document.getElementById('expandedMenu');
+
+  function updateCurrentIcon() {
+    const currentPath = window.location.pathname;
+    const menuItems = [
+      { icon: 'disc', path: '/ruleta' },
+      { icon: 'coins', path: '/cara-cruz' },
+      { icon: 'dices', path: '/dados' },
+    ];
+    const currentItem = menuItems.find(item => item.path === currentPath) || { icon: 'smile' };
+    currentIcon.innerHTML = `<svg width="24" height="24"><use xlink:href="#${currentItem.icon}" /></svg>`;
+  }
+
+  // Update icon when navigation occurs
+  document.addEventListener('astro:after-navigation', () => {
+    updateCurrentIcon();
+  });
+
+  // Initial icon update
+  updateCurrentIcon();
+
+  // Add hover functionality for touch devices
+  let touchTimeout;
+  let isTouch = false;
+
+  dynamicIsland.addEventListener('touchstart', () => {
+    isTouch = true;
+    touchTimeout = setTimeout(() => {
+      dynamicIsland.classList.add('hover');
+    }, 200); // 200ms delay to differentiate between tap and long press
+  });
+
+  dynamicIsland.addEventListener('touchend', () => {
+    isTouch = false;
+    clearTimeout(touchTimeout);
+    setTimeout(() => {
+      if (!isTouch) {
+        dynamicIsland.classList.remove('hover');
+      }
+    }, 100);
+  });
+
+  // Handle click events on menu items
+  expandedMenu.addEventListener('click', (e) => {
+    const link = e.target.closest('a');
+    if (link) {
+      e.preventDefault();
+      window.location.href = link.getAttribute('href');
+    }
+  });
+
+  // Prevent default behavior on tap to avoid immediate navigation on mobile
+  dynamicIsland.addEventListener('click', (e) => {
+    if (e.target === dynamicIsland || e.target === currentIcon) {
+      e.preventDefault();
+    }
+  });
+</script>
+
+<style>
+  /* Add hover simulation for touch devices */
+  #dynamicIsland.hover {
+    width: 280px;
+    height: 60px;
+    border-radius: 30px;
+  }
+
+  #dynamicIsland.hover #currentIcon {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+
+  #dynamicIsland.hover #expandedMenu {
+    opacity: 1;
+    transform: scale(1);
+  }
+</style>

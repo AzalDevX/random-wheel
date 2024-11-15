@@ -1,0 +1,13 @@
+---
+// src/pages/dados.astro
+import Layout from '../layouts/Layout.astro';
+import DiceRoll from '../components/DiceRoll.jsx';
+---
+
+<Layout title="Dados">
+	<div class="min-h-dvh bg-gradient-to-br from-beige-100 to-beige-300 p-8 flex flex-col items-center justify-center">
+		<h1 class="text-4xl md:text-8xl font-bold text-chocolate-800 mb-20">Dados</h1>
+		<DiceRoll client:load />
+		<!-- <a href="/" class="mt-8 bg-chocolate-500 text-beige-100 px-6 py-3 rounded-lg text-xl hover:bg-chocolate-600 transition-colors">Volver al inicio</a> -->
+	</div>
+</Layout>

@@ -1,27 +1,31 @@
-<div class="bg-white rounded-lg shadow-lg p-4 sm:p-6 max-w-md mx-auto">
+---
+// src/components/OptionsList.astro
+---
+
+<div class="bg-beige-100 rounded-lg shadow-chocolate-md p-4 sm:p-6 max-w-md mx-auto">
   <div class="flex justify-between items-center mb-4">
-    <h2 class="text-xl sm:text-2xl font-bold text-gray-800">Options</h2>
+    <h2 class="text-xl sm:text-2xl font-bold text-chocolate-800">Options</h2>
     <div class="relative">
       <button
         id="duplicateAllButton"
-        class="bg-purple-500 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-purple-600 active:bg-purple-700 transition-colors duration-300 text-sm flex items-center"
+        class="bg-chocolate-500 text-beige-100 px-3 sm:px-4 py-2 rounded-lg hover:bg-chocolate-600 active:bg-chocolate-700 transition-colors duration-300 text-sm flex items-center"
       >
         <span>Duplicate All</span>
-        <span id="duplicateAllCount" class="ml-2 bg-purple-700 px-2 py-1 rounded-full text-xs"></span>
+        <span id="duplicateAllCount" class="ml-2 bg-chocolate-700 px-2 py-1 rounded-full text-xs"></span>
       </button>
-      <div id="tooltip" class="w-full absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-sm rounded-lg opacity-0 transition-opacity duration-300 pointer-events-none max-w-xs text-center"></div>
+      <div id="tooltip" class="w-full absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-chocolate-800 text-beige-100 text-sm rounded-lg opacity-0 transition-opacity duration-300 pointer-events-none max-w-xs text-center"></div>
     </div>
   </div>
   <div class="flex mb-4">
     <input
       type="text"
       id="newOption"
-      class="flex-grow px-3 sm:px-4 py-2 text-sm sm:text-base border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+      class="flex-grow px-3 sm:px-4 py-2 text-sm sm:text-base border border-chocolate-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-chocolate-500 bg-beige-50 text-chocolate-800"
       placeholder="Add new option"
     />
     <button
       id="addButton"
-      class="bg-purple-500 text-white px-3 sm:px-4 py-2 rounded-r-lg hover:bg-purple-600 active:bg-purple-700 transition-colors duration-300"
+      class="bg-chocolate-500 text-beige-100 px-3 sm:px-4 py-2 rounded-r-lg hover:bg-chocolate-600 active:bg-chocolate-700 transition-colors duration-300"
     >
       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
     </button>
@@ -36,137 +40,134 @@
 </style>
 
 <script>
-  const newOptionInput = document.getElementById('newOption');
-  const addButton = document.getElementById('addButton');
-  const optionsList = document.getElementById('optionsList');
-  const duplicateAllButton = document.getElementById('duplicateAllButton');
-  const tooltip = document.getElementById('tooltip');
+const newOptionInput = document.getElementById('newOption');
+const addButton = document.getElementById('addButton');
+const optionsList = document.getElementById('optionsList');
+const duplicateAllButton = document.getElementById('duplicateAllButton');
+const tooltip = document.getElementById('tooltip');
 
-  let items = [];
-  let duplicateAllCount = 0;
-  let extraMessageIndex = 0;
+let items = [];
+let duplicateAllCount = 0;
+let extraMessageIndex = 0;
 
-  const extraMessages = [
-    "No puedes darle más.",
-    "¿Por qué sigues intentándolo?",
-    "¿No ves que no se puede más?",
-    "Mira que eres cabezota...",
-    "Esto no va a funcionar.",
-    "Sigue intentándolo, pero no pasará nada.",
-    "Insistir no cambiará las reglas.",
-    "Ya te lo dije, no hay más clics.",
-    "Parece que no te das por vencido, ¿eh?",
-    "¿Crees que esto va a cambiar algo?",
-    "Clickea todo lo que quieras, no hay más.",
-    "¡Qué perseverancia! Pero aquí no hay premio.",
-    "¿De verdad sigues intentando?",
-    "Esto es un botón, no una máquina de milagros.",
-    "La terquedad no siempre es virtud.",
-    "¡Ey! Ya no hay nada más, relájate.",
-    "¿Otra vez? ¿No te cansas?",
-    "No importa cuánto lo intentes, no va a cambiar.",
-    "Vas a desgastar el botón de tanto clic.",
-    "Tranquilo, que no hay más sorpresas escondidas.",
-  ];
+const extraMessages = [
+  "No puedes darle más.",
+  "¿Por qué sigues intentándolo?",
+  "¿No ves que no se puede más?",
+  "Mira que eres cabezota...",
+  "Esto no va a funcionar.",
+  "Sigue intentándolo, pero no pasará nada.",
+  "Insistir no cambiará las reglas.",
+  "Ya te lo dije, no hay más clics.",
+  "Parece que no te das por vencido, ¿eh?",
+  "¿Crees que esto va a cambiar algo?",
+  "Clickea todo lo que quieras, no hay más.",
+  "¡Qué perseverancia! Pero aquí no hay premio.",
+  "¿De verdad sigues intentando?",
+  "Esto es un botón, no una máquina de milagros.",
+  "La terquedad no siempre es virtud.",
+  "¡Ey! Ya no hay nada más, relájate.",
+  "¿Otra vez? ¿No te cansas?",
+  "No importa cuánto lo intentes, no va a cambiar.",
+  "Vas a desgastar el botón de tanto clic.",
+  "Tranquilo, que no hay más sorpresas escondidas.",
+];
 
-  function addOption() {
-    const newOption = newOptionInput.value.trim();
-    if (!newOption) return;
-    items.push(newOption);
-    updateOptionsList();
-    newOptionInput.value = '';
-    newOptionInput.focus();
-  }
-
-  function removeOption(index) {
-    items.splice(index, 1);
-    updateOptionsList();
-  }
-
-  function duplicateOption(index) {
-    const duplicatedOption = items[index];
-    items.splice(index + 1, 0, duplicatedOption);
-    updateOptionsList();
-  }
-
-  function updateOptionsList() {
-    optionsList.innerHTML = '';
-    items.forEach((item, index) => {
-      const li = document.createElement('li');
-      li.className = 'flex justify-between items-center bg-gray-100 px-3 sm:px-4 py-2 rounded-lg text-sm sm:text-base';
-      li.innerHTML = `
-        <span class="break-all mr-2">${item}</span>
-        <div class="flex-shrink-0">
-          <button class="text-blue-500 hover:text-blue-700 transition-colors duration-300 mr-2" data-action="duplicate" data-index="${index}">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-          </button>
-          <button class="text-red-500 hover:text-red-700 transition-colors duration-300" data-action="remove" data-index="${index}">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-          </button>
-        </div>
-      `;
-      optionsList.appendChild(li);
-    });
-
-    // Dispatch event to update wheel
-    const event = new CustomEvent('itemsUpdated', { detail: items });
-    document.dispatchEvent(event);
-  }
-
-  function showTooltip(message) {
-    tooltip.textContent = message;
-    tooltip.style.opacity = '1';
-    tooltip.style.visibility = 'visible';
-    //clear timeot
-    const time = setTimeout(() => {
-      tooltip.style.opacity = '0';
-      setTimeout(() => {
-        tooltip.style.visibility = 'hidden';
-      }, 3000);
-    clearTimeout(time);
-    }, 2000);
-    clearTimeout(time);
-  }
-
-  addButton.addEventListener('click', addOption);
-  optionsList.addEventListener('click', (e) => {
-    const button = e.target.closest('button');
-    if (button) {
-      const action = button.dataset.action;
-      const index = parseInt(button.dataset.index);
-      if (action === 'remove') {
-        removeOption(index);
-      } else if (action === 'duplicate') {
-        duplicateOption(index);
-      }
-    }
-  });
-
-  newOptionInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-      addOption();
-    }
-  });
-
-  duplicateAllButton.addEventListener('click', () => {
-    if (duplicateAllCount < 5) {
-      const newItems = [...items, ...items];
-      items = newItems;
-      updateOptionsList();
-      duplicateAllCount++;
-      updateDuplicateAllButton();
-    } else {
-      const message = extraMessages[extraMessageIndex];
-      showTooltip(message);
-      extraMessageIndex = (extraMessageIndex + 1) % extraMessages.length;
-    }
-  });
-
-  function updateDuplicateAllButton() {
-    duplicateAllButton.classList.toggle('opacity-50', duplicateAllCount >= 5);
-    document.getElementById('duplicateAllCount').textContent = duplicateAllCount >= 5 ? '5/5' : `${duplicateAllCount}/5`;
-  }
-
+function addOption() {
+  const newOption = newOptionInput.value.trim();
+  if (!newOption) return;
+  items.push(newOption);
   updateOptionsList();
-  updateDuplicateAllButton();
+  newOptionInput.value = '';
+  newOptionInput.focus();
+}
+
+function removeOption(index) {
+  items.splice(index, 1);
+  updateOptionsList();
+}
+
+function duplicateOption(index) {
+  const duplicatedOption = items[index];
+  items.splice(index + 1, 0, duplicatedOption);
+  updateOptionsList();
+}
+
+function updateOptionsList() {
+  optionsList.innerHTML = '';
+  items.forEach((item, index) => {
+    const li = document.createElement('li');
+    li.className = 'flex justify-between items-center bg-beige-200 px-3 sm:px-4 py-2 rounded-lg text-sm sm:text-base';
+    li.innerHTML = `
+      <span class="break-all mr-2 text-chocolate-800">${item}</span>
+      <div class="flex-shrink-0">
+        <button class="text-chocolate-600 hover:text-chocolate-800 transition-colors duration-300 mr-2" data-action="duplicate" data-index="${index}">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+        </button>
+        <button class="text-chocolate-600 hover:text-chocolate-800 transition-colors duration-300" data-action="remove" data-index="${index}">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+    `;
+    optionsList.appendChild(li);
+  });
+
+  // Dispatch event to update wheel
+  const event = new CustomEvent('itemsUpdated', { detail: items });
+  document.dispatchEvent(event);
+}
+
+function showTooltip(message) {
+  tooltip.textContent = message;
+  tooltip.style.opacity = '1';
+  tooltip.style.visibility = 'visible';
+  setTimeout(() => {
+    tooltip.style.opacity = '0';
+    setTimeout(() => {
+      tooltip.style.visibility = 'hidden';
+    }, 300);
+  }, 2000);
+}
+
+addButton.addEventListener('click', addOption);
+optionsList.addEventListener('click', (e) => {
+  const button = e.target.closest('button');
+  if (button) {
+    const action = button.dataset.action;
+    const index = parseInt(button.dataset.index);
+    if (action === 'remove') {
+      removeOption(index);
+    } else if (action === 'duplicate') {
+      duplicateOption(index);
+    }
+  }
+});
+
+newOptionInput.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') {
+    addOption();
+  }
+});
+
+duplicateAllButton.addEventListener('click', () => {
+  if (duplicateAllCount < 5) {
+    const newItems = [...items, ...items];
+    items = newItems;
+    updateOptionsList();
+    duplicateAllCount++;
+    updateDuplicateAllButton();
+  } else {
+    const message = extraMessages[extraMessageIndex];
+    showTooltip(message);
+    extraMessageIndex = (extraMessageIndex + 1) % extraMessages.length;
+  }
+});
+
+function updateDuplicateAllButton() {
+  duplicateAllButton.classList.toggle('opacity-50', duplicateAllCount >= 5);
+  document.getElementById('duplicateAllCount').textContent = duplicateAllCount >= 5 ? '5/5' : `${duplicateAllCount}/5`;
+}
+
+updateOptionsList();
+updateDuplicateAllButton();
 </script>

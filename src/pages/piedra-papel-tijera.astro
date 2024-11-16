@@ -1,0 +1,12 @@
+---
+// src/pages/piedra-papel-tijera.astro
+import Layout from '../layouts/Layout.astro';
+import RockPaperScissors from '../components/RockPaperScissors.jsx';
+---
+
+<Layout title="Piedra, Papel o Tijera">
+	<div class="min-h-dvh bg-gradient-to-br from-beige-100 to-beige-300 p-8 flex flex-col items-center justify-center">
+		<h1 class="text-3xl md:text-8xl font-bold text-chocolate-800 mb-20">Piedra, Papel o Tijera</h1>
+		<RockPaperScissors client:load />
+	</div>
+</Layout>

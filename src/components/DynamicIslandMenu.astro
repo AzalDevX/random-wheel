@@ -1,11 +1,12 @@
 ---
 // src/components/DynamicIslandMenu.astro
-import { Dices, Disc, Coins, Smile } from 'lucide-react'
+import { Dices, Disc, Coins, Smile, Scissors } from 'lucide-react'
 
 const menuItems = [
   { icon: 'disc', path: '/ruleta', label: 'Ruleta' },
   { icon: 'coins', path: '/cara-cruz', label: 'Cara o Cruz' },
   { icon: 'dices', path: '/dados', label: 'Dados' },
+  { icon: 'scissors', path: '/piedra-papel-tijera', label: 'Piedra, Papel o Tijera' },
 ];
 ---
 
@@ -19,6 +20,7 @@ const menuItems = [
         {item.icon === 'disc' && <Disc size={24} />}
         {item.icon === 'coins' && <Coins size={24} />}
         {item.icon === 'dices' && <Dices size={24} />}
+        {item.icon === 'scissors' && <Scissors size={24} />}
       </a>
     ))}
   </div>
@@ -35,6 +37,7 @@ const menuItems = [
       { icon: 'disc', path: '/ruleta' },
       { icon: 'coins', path: '/cara-cruz' },
       { icon: 'dices', path: '/dados' },
+      { icon: 'scissors', path: '/piedra-papel-tijera' },
     ];
     const currentItem = menuItems.find(item => item.path === currentPath) || { icon: 'smile' };
     currentIcon.innerHTML = `<svg width="24" height="24"><use xlink:href="#${currentItem.icon}" /></svg>`;

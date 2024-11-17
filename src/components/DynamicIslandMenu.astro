@@ -1,6 +1,6 @@
 ---
 // src/components/DynamicIslandMenu.astro
-import { Dices, Disc, Coins, Smile, Scissors, Zap } from 'lucide-react'
+import { Dices, Disc, Coins, Smile, Scissors, Zap, Timer } from 'lucide-react'
 
 const menuItems = [
   { icon: 'disc', path: '/ruleta', label: 'Ruleta' },
@@ -8,10 +8,11 @@ const menuItems = [
   { icon: 'dices', path: '/dados', label: 'Dados' },
   { icon: 'scissors', path: '/piedra-papel-tijera', label: 'Piedra, Papel o Tijera' },
   { icon: 'zap', path: '/clicker-rapido', label: 'Clicker Rápido' },
+  { icon: 'timer', path: '/deten-cronometro', label: 'Detén el Cronómetro' },
 ];
 ---
 
-<div id="dynamicIsland" class="group fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-[120px] h-[44px] bg-chocolate-800 text-beige-300 rounded-[22px] flex items-center justify-center cursor-pointer overflow-visible transition-all duration-300 ease-in-out hover:w-[280px] hover:h-[60px] hover:rounded-[30px]">
+<div id="dynamicIsland" class="group fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-[120px] h-[44px] bg-chocolate-800 text-beige-300 rounded-[22px] flex items-center justify-center cursor-pointer overflow-visible transition-all duration-300 ease-in-out hover:w-[350px] hover:h-[60px] hover:rounded-[30px]">
   <div id="currentIcon" class="absolute opacity-100 transition-all duration-300 group-hover:opacity-0 group-hover:scale-50">
     <Smile size={24} />
   </div>
@@ -24,6 +25,7 @@ const menuItems = [
           {item.icon === 'dices' && <Dices size={24} />}
           {item.icon === 'scissors' && <Scissors size={24} />}
           {item.icon === 'zap' && <Zap size={24} />}
+          {item.icon === 'timer' && <Timer size={24} />}
         </a>
         <div class="tooltip absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-2 py-1 bg-chocolate-900 text-beige-100 text-xs rounded-md opacity-0 group-hover/tooltip:opacity-100 transition-opacity duration-300 whitespace-nowrap z-[60]">
           {item.label}
@@ -47,6 +49,7 @@ const menuItems = [
       { icon: 'dices', path: '/dados' },
       { icon: 'scissors', path: '/piedra-papel-tijera' },
       { icon: 'zap', path: '/clicker-rapido' },
+      { icon: 'timer', path: '/deten-cronometro' },
     ];
     const currentItem = menuItems.find(item => item.path === currentPath) || { icon: 'smile' };
     currentIcon.innerHTML = `<svg width="24" height="24"><use xlink:href="#${currentItem.icon}" /></svg>`;
